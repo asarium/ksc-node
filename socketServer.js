@@ -1,0 +1,55 @@
+/**
+ * User: Marius
+ * Date: 14.02.2015
+ * Time: 15:23
+ */
+
+SocketServer = (function ()
+{
+    var log = require("./logging");
+    var WebSocketServer = require("ws").Server;
+
+    function Server()
+    {
+        this.lastData = null;
+    }
+
+    Server.prototype.open = function (port)
+    {
+        log.info("Starting WebSocketServer...");
+        this.wss = new WebSocketServer({port: port});
+
+        var that = this;
+        this.wss.broadcast = function (data)
+        {
+            that.wss.clients.forEach(function (client)
+                                     {
+                                         client.send(data, {mask: false});
+                                     });
+        };
+
+        this.wss.on("connection", function (ws)
+        {
+            if (that.lastData != null)
+            {
+                // If we already have data, send the client the last data
+                ws.send(JSON.stringify(that.lastData));
+            }
+        });
+    };
+
+    Server.prototype.sendToAll = function (data)
+    {
+        this.lastData = data;
+        this.wss.broadcast(JSON.stringify(data));
+    };
+
+    Server.prototype.close = function ()
+    {
+        this.wss.close();
+    };
+
+    return Server;
+})();
+
+module.exports = SocketServer;
