@@ -32,9 +32,11 @@ var server = http.createServer(function (req, res)
                                    serve(req, res, done);
                                });
 
+var httpPort = process.env.PORT || 8080;
+
 // Start the various servers and listeners
 kscListener.start();
-socketServer.open(8070);
+socketServer.open(httpPort);
 server.listen(8080);
 
 process.on('SIGINT', function ()
