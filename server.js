@@ -36,8 +36,8 @@ var httpPort = process.env.PORT || 8080;
 
 // Start the various servers and listeners
 kscListener.start();
-socketServer.open(httpPort);
-server.listen(8080);
+socketServer.open(8070);
+server.listen(httpPort);
 
 process.on('SIGINT', function ()
 {
