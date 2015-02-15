@@ -1,0 +1,18 @@
+
+#ksc-container {
+    float: left;
+    width: 50%;
+}
+
+#ksc-content {
+    word-wrap: break-word;
+}
+
+#vafb-container {
+    float: right;
+    width: 50%;
+}
+
+#vafb-content {
+    word-wrap: break-word;
+}
