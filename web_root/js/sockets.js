@@ -26,9 +26,8 @@
 
         socket.onmessage = function (msg)
         {
-            var data = JSON.parse(msg.data);
-            console.log("Received message: " + data);
-            container.text(data);
+            console.log("Received message: " + msg.data);
+            container.text(msg.data);
         };
 
         socket.onclose = function ()
