@@ -12,7 +12,7 @@
         var container = $("#content");
         var domain = window.location.host;
 
-        var socket = new WebSocket("ws://" + domain + "/ws");
+        var socket = new WebSocket("ws://" + domain + ":8080/ws");
 
         socket.onopen = function ()
         {

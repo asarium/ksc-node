@@ -22,6 +22,7 @@ var KSC = (function ()
             type = "ksc";
         }
 
+        this.type = type;
         switch (type)
         {
             case "vafb":
@@ -54,26 +55,26 @@ var KSC = (function ()
     {
         var message = new Buffer("\000");
 
-        log.info("Sending message to " + this.host + ":" + this.port + "...");
+        log.info("[" + this.type + "] Sending message to " + this.host + ":" + this.port + "...");
         this.socket.send(message, 0, message.length, this.port, this.host, function (err)
         {
             if (err)
             {
-                log.error("Failed to send: " + err);
+                log.error("[" + this.type + "] Failed to send: " + err);
             }
         });
     };
 
     KSC.prototype.start = function ()
     {
-        log.info("Starting listener for " + this.host + ":" + this.port);
+        log.info("[" + this.type + "] Starting listener for " + this.host + ":" + this.port);
 
         var that = this;
 
         this.socket = dgram.createSocket("udp4");
         this.socket.on("message", function (msg, rinfo)
         {
-            log.info("Received message...");
+            log.info("[" + that.type + "] Received message...");
             var parsed = that.processBuffer(msg);
 
             if (parsed != null)
@@ -112,7 +113,7 @@ var KSC = (function ()
 
         if (buffer.length < 3)
         {
-            log.warn("Message was too small (" + buffer.length + " bytes)...");
+            log.warn("[" + this.type + "] Message was too small (" + buffer.length + " bytes)...");
             return null;
         }
 
@@ -137,7 +138,7 @@ var KSC = (function ()
             log.warn("KSC delivered too many keys!");
             return null;
         }
-        log.info("Processing data...");
+        log.info("[" + this.type + "] Processing data...");
 
         var key_offs = 3;
         var val_offs = key_offs + changes * KSC_KEY_LEN;
