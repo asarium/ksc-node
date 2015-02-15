@@ -13,7 +13,7 @@ var finalhandler = require('finalhandler');
 var serveStatic = require("serve-static");
 var http = require("http");
 
-var serve = serveStatic("web_root", {
+var serve = serveStatic(__dirname + "/web_root", {
     "index": ["index.html"]
 });
 
