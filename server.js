@@ -6,6 +6,7 @@
 
 var KSC = require("./ksc");
 var log = require("./logging");
+var processor = require("./dataProcessor");
 var WebSocketServer = require("./socketServer");
 
 var finalhandler = require('finalhandler');
@@ -19,12 +20,10 @@ var serve = serveStatic("web_root", {
 var socketServer = new WebSocketServer();
 
 var kscListener = new KSC("ksc");
-kscListener.onData(function (data)
-                   {
-                       log.info("Sending data...");
+var vafbListener = new KSC("vafb");
 
-                       socketServer.sendToAll(JSON.stringify(data));
-                   });
+// This handles generating the final JavaScript object and sending it to the socket server
+processor(kscListener, vafbListener, socketServer);
 
 var server = http.createServer(function (req, res)
                                {
@@ -36,6 +35,8 @@ var httpPort = process.env.PORT || 8080;
 
 // Start the various servers and listeners
 kscListener.start();
+vafbListener.start();
+
 socketServer.open(8070);
 server.listen(httpPort);
 
@@ -46,6 +47,7 @@ process.on('SIGINT', function ()
     server.close();
     socketServer.close();
     kscListener.stop();
+    vafbListener.stop();
 
     process.exit();
 });

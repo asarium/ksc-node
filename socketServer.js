@@ -24,7 +24,7 @@ SocketServer = (function ()
         {
             that.wss.clients.forEach(function (client)
                                      {
-                                         client.send(data, {mask: false});
+                                         client.send(data);
                                      });
         };
 
