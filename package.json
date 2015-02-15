@@ -1,8 +1,14 @@
 {
   "name": "ksc.js",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/asarium/ksc-node.git"
+  },
   "dependencies": {
+    "config": "^1.11.0",
     "finalhandler": "^0.3.3",
+    "js-yaml": "^3.2.6",
     "serve-static": "^1.8.1",
     "winston": "*",
     "ws": "^0.7.1"

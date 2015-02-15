@@ -1,0 +1,11 @@
+Countdown:
+  messageInterval: 2000
+  KSC:
+    host: countdown.ksc.nasa.gov
+    port: 11142
+  VAFB:
+    host: countdown.ksc.nasa.gov
+    port: 11144
+Server:
+  port: 8080
+  webSocketPath: /ws

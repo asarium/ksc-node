@@ -14,10 +14,13 @@ SocketServer = (function ()
         this.lastData = null;
     }
 
-    Server.prototype.open = function (port)
+    Server.prototype.open = function (httpServer, serverPath)
     {
         log.info("Starting WebSocketServer...");
-        this.wss = new WebSocketServer({port: port});
+        this.wss = new WebSocketServer({
+                                           server: httpServer,
+                                           path  : serverPath
+                                       });
 
         var that = this;
         this.wss.broadcast = function (data)

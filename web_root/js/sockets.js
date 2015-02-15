@@ -10,9 +10,9 @@
     function readyFunction()
     {
         var container = $("#content");
-        var domain = document.domain;
+        var domain = window.location.host;
 
-        var socket = new WebSocket("ws://" + domain + ":8070/");
+        var socket = new WebSocket("ws://" + domain + "/ws");
 
         socket.onopen = function ()
         {

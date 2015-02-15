@@ -5,10 +5,10 @@
  */
 
 var KSC = require("./ksc");
-var log = require("./logging");
 var processor = require("./dataProcessor");
 var WebSocketServer = require("./socketServer");
 
+var config = require("config");
 var finalhandler = require('finalhandler');
 var serveStatic = require("serve-static");
 var http = require("http");
@@ -31,13 +31,13 @@ var server = http.createServer(function (req, res)
                                    serve(req, res, done);
                                });
 
-var httpPort = process.env.PORT || 8080;
+var httpPort = process.env.PORT || config.get("Server.port");
 
 // Start the various servers and listeners
 kscListener.start();
 vafbListener.start();
 
-socketServer.open(8070);
+socketServer.open(server, config.get("Server.webSocketPath"));
 server.listen(httpPort);
 
 process.on('SIGINT', function ()

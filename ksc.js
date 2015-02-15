@@ -3,22 +3,17 @@
  * Date: 14.02.2015
  * Time: 10:11
  */
-const HOST = "countdown.ksc.nasa.gov";
-const KSC_PORT = 11142;
-const KSC_PORT_VAFB = 11144;
-
 const KSC_PATTERN = 10;
 const KSC_VERSION = 1;
 const KSC_KEY_LEN = 10;
 
-const INTERVAL_DELAY = 2000;
-
 var KSC = (function ()
 {
-
     var log = require("./logging");
-    var dgram = require("dgram");
     var entries = require("./ksc-entries");
+
+    var dgram = require("dgram");
+    var config = require("config");
 
     function KSC(type)
     {
@@ -30,14 +25,17 @@ var KSC = (function ()
         switch (type)
         {
             case "vafb":
-                this.port = KSC_PORT_VAFB;
+                this.port = config.get("Countdown.VAFB.port");
+                this.host = config.get("Countdown.VAFB.host");
                 break;
             default:
-                this.port = KSC_PORT;
+                this.port = config.get("Countdown.KSC.port");
+                this.host = config.get("Countdown.KSC.host");
                 break;
         }
 
         this.socket = null;
+        this.messageInterval = config.get("Countdown.messageInterval");
     }
 
     function endOnNull(string)
@@ -56,8 +54,8 @@ var KSC = (function ()
     {
         var message = new Buffer("\000");
 
-        log.info("Sending message...");
-        this.socket.send(message, 0, message.length, this.port, HOST, function (err)
+        log.info("Sending message to " + this.host + ":" + this.port + "...");
+        this.socket.send(message, 0, message.length, this.port, this.host, function (err)
         {
             if (err)
             {
@@ -68,7 +66,7 @@ var KSC = (function ()
 
     KSC.prototype.start = function ()
     {
-        log.info("Starting listener for " + HOST + ":" + this.port);
+        log.info("Starting listener for " + this.host + ":" + this.port);
 
         var that = this;
 
@@ -87,7 +85,7 @@ var KSC = (function ()
         this.intervalCancel = setInterval(function ()
                                           {
                                               that.sendNextMessage();
-                                          }, INTERVAL_DELAY);
+                                          }, this.messageInterval);
         this.sendNextMessage();
     };
 
@@ -146,7 +144,7 @@ var KSC = (function ()
 
         var output = {
             generated: Math.floor(Date.now() / 1000),
-            raw: {}
+            raw      : {}
         };
 
         for (var i = 0; i < changes; ++i, key_offs += KSC_KEY_LEN)
@@ -156,7 +154,8 @@ var KSC = (function ()
             {
                 if (entries[j].key == currentKey)
                 {
-                    output.raw[entries[j].key] = endOnNull(buffer.toString("ascii", val_offs, val_offs + entries[j].len));
+                    output.raw[entries[j].key] =
+                            endOnNull(buffer.toString("ascii", val_offs, val_offs + entries[j].len));
                     val_offs += entries[j].len;
 
                     break;
