@@ -92,12 +92,20 @@ var KSC = (function ()
         this.socket = dgram.createSocket("udp4");
         this.socket.on("message", function (msg, rinfo)
         {
-            var parsed = that.processBuffer(msg);
-
-            if (parsed != null)
+            try
             {
+                var parsed = that.processBuffer(msg);
+
+                if (parsed != null)
+                {
+                    that.dataCallback(parsed);
+                }
+                // Reset this even if there was no valid data
                 that.lastValidMessageTime = Date.now();
-                that.dataCallback(parsed);
+            }
+            catch (e)
+            {
+                log.info("[" + that.type + "] Processing error: " + e);
             }
         });
         this.socket.on("error", function (err)
@@ -133,32 +141,51 @@ var KSC = (function ()
         // 3 - changes * KEY_LEN: the changed keys
         // rest: the values of the keys
 
-        if (buffer.length <= 3)
+        var pattern, version, changes;
+
+        if (buffer.length > 0)
         {
-            log.warn("[" + this.type + "] Message was too small (" + buffer.length + " bytes)...");
+            pattern = buffer.readUInt8(0);
+        }
+        else
+        {
+            // Not enough data
             return null;
         }
 
-        var pattern = buffer.readUInt8(0);
-        var version = buffer.readUInt8(1);
-        var changes = buffer.readUInt8(2);
+        if (buffer.length > 1)
+        {
+            version = buffer.readUInt8(1);
+        }
+        else
+        {
+            // Not enough data
+            return null;
+        }
+
+        if (buffer.length > 2)
+        {
+            changes = buffer.readUInt8(2);
+        }
+        else
+        {
+            // Not enough data
+            return null;
+        }
 
         if (pattern != KSC_PATTERN)
         {
-            log.warn("[" + this.type + "] Pattern doesn't match!");
-            return null;
+            throw "Pattern doesn't match!";
         }
 
         if (version != KSC_VERSION)
         {
-            log.warn("[" + this.type + "] version doesn't match!");
-            return null;
+            throw "Version doesn't match!";
         }
 
         if (changes > entries.length)
         {
-            log.warn("[" + this.type + "] delivered too many keys!");
-            return null;
+            throw "Got too many keys!";
         }
 
         var key_offs = 3;
