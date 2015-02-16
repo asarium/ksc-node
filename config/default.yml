@@ -1,5 +1,5 @@
 Countdown:
-  messageInterval: 2000
+  messageInterval: 1000
   legacyFile: web_root/ksc.json
   KSC:
     host: countdown.ksc.nasa.gov
