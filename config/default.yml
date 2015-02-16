@@ -1,6 +1,6 @@
 Countdown:
   messageInterval: 2000
-  legacyFile: ksc.json
+  legacyFile: web_root/ksc.json
   KSC:
     host: countdown.ksc.nasa.gov
     port: 11142
