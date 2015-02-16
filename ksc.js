@@ -72,8 +72,6 @@ var KSC = (function ()
             this.port = this.useSecondaryPort ? this.secondaryPort : this.primaryPort;
         }
 
-        log.info("[" + this.type + "] Sending message to " + this.host + ":" + this.port + "...");
-
         var that = this;
         this.socket.send(message, 0, message.length, this.port, this.host, function (err)
         {
@@ -93,7 +91,6 @@ var KSC = (function ()
         this.socket = dgram.createSocket("udp4");
         this.socket.on("message", function (msg, rinfo)
         {
-            log.info(util.format("[%s] Received message from %s:%d...", that.type, rinfo.address, rinfo.port));
             var parsed = that.processBuffer(msg);
 
             if (parsed != null)
@@ -147,22 +144,21 @@ var KSC = (function ()
 
         if (pattern != KSC_PATTERN)
         {
-            log.warn("KSC Pattern doesn't match!");
+            log.warn("[" + this.type + "] Pattern doesn't match!");
             return null;
         }
 
         if (version != KSC_VERSION)
         {
-            log.warn("KSC version doesn't match!");
+            log.warn("[" + this.type + "] version doesn't match!");
             return null;
         }
 
         if (changes > entries.length)
         {
-            log.warn("KSC delivered too many keys!");
+            log.warn("[" + this.type + "] delivered too many keys!");
             return null;
         }
-        log.info("[" + this.type + "] Processing data...");
 
         var key_offs = 3;
         var val_offs = key_offs + changes * KSC_KEY_LEN;

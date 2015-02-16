@@ -24,13 +24,11 @@ module.exports = function (ksc, vafb, socketServer)
             JSON.stringify(outputObject),
             function(e) {
                 if (e) {
-                    log.info("Error writing legacy file: " + e.toString());
-                } else {
-                    log.info("Written legacy file");
+                    log.warn("Error writing legacy file: " + e.toString());
                 }
             }
         );
-    }
+    };
 
     ksc.onData(function (data)
                {
