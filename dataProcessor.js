@@ -18,15 +18,27 @@ module.exports = function (ksc, vafb, socketServer)
         vafb: {}
     };
 
-    var writeToLegacy = function() {
+    var writingFile = false;
+    var writeToLegacy = function ()
+    {
+        if (writingFile)
+        {
+            // Don't try to write the file again, it will only cause errors...
+            return;
+        }
+
+        writingFile = true;
         fs.writeFile(
-            config.get("Countdown.legacyFile"),
-            JSON.stringify(outputObject),
-            function(e) {
-                if (e) {
-                    log.warn("Error writing legacy file: " + e.toString());
+                config.get("Countdown.legacyFile"),
+                JSON.stringify(outputObject),
+                function (e)
+                {
+                    writingFile = false;
+                    if (e)
+                    {
+                        log.warn("Error writing legacy file: " + e.toString());
+                    }
                 }
-            }
         );
     };
 
