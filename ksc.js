@@ -70,6 +70,7 @@ var KSC = (function ()
 
             this.useSecondaryPort = !this.useSecondaryPort;
             this.port = this.useSecondaryPort ? this.secondaryPort : this.primaryPort;
+            this.lastValidMessageTime = Date.now();
         }
 
         var that = this;
