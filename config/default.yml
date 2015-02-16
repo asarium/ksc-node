@@ -1,12 +1,17 @@
 Countdown:
   messageInterval: 1000
   legacyFile: web_root/ksc.json
+  portSwitchInterval: 5000
   KSC:
     host: countdown.ksc.nasa.gov
-    port: 11142
+    Ports:
+      primary: 11142
+      secondary: 11143
   VAFB:
     host: countdown.ksc.nasa.gov
-    port: 11144
+    Ports:
+      primary: 11144
+      secondary: 11145
 Server:
   port: 8080
   webSocketPath: /ws

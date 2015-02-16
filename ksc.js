@@ -14,6 +14,7 @@ var KSC = (function ()
 
     var dgram = require("dgram");
     var config = require("config");
+    var util = require("util");
 
     function KSC(type)
     {
@@ -26,14 +27,20 @@ var KSC = (function ()
         switch (type)
         {
             case "vafb":
-                this.port = config.get("Countdown.VAFB.port");
+                this.primaryPort = config.get("Countdown.VAFB.Ports.primary");
+                this.secondaryPort = config.get("Countdown.VAFB.Ports.secondary");
                 this.host = config.get("Countdown.VAFB.host");
                 break;
             default:
-                this.port = config.get("Countdown.KSC.port");
+                this.primaryPort = config.get("Countdown.KSC.Ports.primary");
+                this.secondaryPort = config.get("Countdown.KSC.Ports.secondary");
                 this.host = config.get("Countdown.KSC.host");
                 break;
         }
+        this.portSwitchInterval = config.get("Countdown.portSwitchInterval");
+        this.lastValidMessageTime = Date.now();
+        this.useSecondaryPort = false;
+        this.port = this.primaryPort;
 
         this.socket = null;
         this.messageInterval = config.get("Countdown.messageInterval");
@@ -55,12 +62,24 @@ var KSC = (function ()
     {
         var message = new Buffer("\000");
 
+        var lastMsgDiff = Date.now() - this.lastValidMessageTime;
+        if (lastMsgDiff > this.portSwitchInterval)
+        {
+            // No answer from this port maybe the other is more cooperative...
+            log.info("[" + this.type + "] No answer received, switching ports...");
+
+            this.useSecondaryPort = !this.useSecondaryPort;
+            this.port = this.useSecondaryPort ? this.secondaryPort : this.primaryPort;
+        }
+
         log.info("[" + this.type + "] Sending message to " + this.host + ":" + this.port + "...");
+
+        var that = this;
         this.socket.send(message, 0, message.length, this.port, this.host, function (err)
         {
             if (err)
             {
-                log.error("[" + this.type + "] Failed to send: " + err);
+                log.error("[" + that.type + "] Failed to send: " + err);
             }
         });
     };
@@ -74,13 +93,18 @@ var KSC = (function ()
         this.socket = dgram.createSocket("udp4");
         this.socket.on("message", function (msg, rinfo)
         {
-            log.info("[" + that.type + "] Received message...");
+            log.info(util.format("[%s] Received message from %s:%d...", that.type, rinfo.address, rinfo.port));
             var parsed = that.processBuffer(msg);
 
             if (parsed != null)
             {
+                that.lastValidMessageTime = Date.now();
                 that.dataCallback(parsed);
             }
+        });
+        this.socket.on("error", function (err)
+        {
+            log.error("[" + that.type + "] Error occurred: " + err.stack);
         });
 
         this.intervalCancel = setInterval(function ()
@@ -111,7 +135,7 @@ var KSC = (function ()
         // 3 - changes * KEY_LEN: the changed keys
         // rest: the values of the keys
 
-        if (buffer.length < 3)
+        if (buffer.length <= 3)
         {
             log.warn("[" + this.type + "] Message was too small (" + buffer.length + " bytes)...");
             return null;
