@@ -29,7 +29,7 @@
 
         var domain = window.location.host;
 
-        var socket = new WebSocket("ws://" + domain + ":8080/ws");
+        var socket = new WebSocket("ws://" + domain + "/ws");
 
         socket.onopen = function ()
         {
