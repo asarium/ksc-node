@@ -192,7 +192,6 @@ var KSC = (function ()
         var val_offs = key_offs + changes * KSC_KEY_LEN;
 
         var output = {
-            generated: Math.floor(Date.now() / 1000),
             raw      : {}
         };
 
@@ -204,7 +203,7 @@ var KSC = (function ()
                 if (entries[j].key == currentKey)
                 {
                     output.raw[entries[j].key] =
-                            endOnNull(buffer.toString("ascii", val_offs, val_offs + entries[j].len));
+                            endOnNull(buffer.toString("ascii", val_offs, val_offs + entries[j].len)).trim();
                     val_offs += entries[j].len;
 
                     break;
