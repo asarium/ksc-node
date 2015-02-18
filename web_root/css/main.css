@@ -1,7 +1,12 @@
 
 #ksc-container {
     float: left;
-    width: 50%;
+    width: 49%;
+}
+
+#ksc-container > div {
+    overflow: auto;
+    margin-bottom: 1em;
 }
 
 #ksc-content {
@@ -10,7 +15,12 @@
 
 #vafb-container {
     float: right;
-    width: 50%;
+    width: 49%;
+}
+
+#vafb-container > div {
+    overflow: auto;
+    margin-bottom: 1em;
 }
 
 #vafb-content {
