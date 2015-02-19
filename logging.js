@@ -1,9 +1,3 @@
-/**
- * User: Marius
- * Date: 14.02.2015
- * Time: 10:46
- */
-
 var winston = require("winston");
 
 var logger = new (winston.Logger)({

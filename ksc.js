@@ -1,8 +1,3 @@
-/**
- * User: Marius
- * Date: 14.02.2015
- * Time: 10:11
- */
 const KSC_PATTERN = 10;
 const KSC_VERSION = 1;
 const KSC_KEY_LEN = 10;

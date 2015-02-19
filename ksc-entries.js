@@ -1,9 +1,3 @@
-/**
- * User: Marius
- * Date: 14.02.2015
- * Time: 12:05
- */
-
 module.exports = [
     {key: "GMTTSTRG01", len: 12},
     {key: "LOCLSTRG02", len: 3},

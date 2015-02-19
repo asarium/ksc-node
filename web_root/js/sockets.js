@@ -1,8 +1,3 @@
-/**
- * User: Marius
- * Date: 14.02.2015
- * Time: 15:58
- */
 (function ($)
 {
     $(document).ready(readyFunction);

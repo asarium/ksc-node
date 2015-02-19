@@ -1,8 +1,3 @@
-/**
- * User: Marius
- * Date: 14.02.2015
- * Time: 10:59
- */
 
 var KSC = require("./ksc");
 var processor = require("./dataProcessor");

@@ -1,9 +1,3 @@
-/**
- * User: Marius
- * Date: 15.02.2015
- * Time: 11:04
- */
-
 var log = require("./logging");
 
 var fs = require("fs");

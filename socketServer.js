@@ -1,9 +1,3 @@
-/**
- * User: Marius
- * Date: 14.02.2015
- * Time: 15:23
- */
-
 SocketServer = (function ()
 {
     var log = require("./logging");
