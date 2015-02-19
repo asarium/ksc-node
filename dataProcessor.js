@@ -71,9 +71,20 @@ module.exports = function (ksc, vafb, socketServer)
 
     var processRawData = function (rawData)
     {
-        var events = [];
-        var out = {};
-        out.times = {};
+        var out = {
+            times: {
+                gmt: null,
+                local: null,
+                windowOpens: null,
+                expected: null,
+                custom: []
+            },
+            tz: null,
+            hold: null,
+            vehicle: null,
+            spacecraft: null,
+            events: []
+        };
 
         if (rawData['GMTTSTRG01'])
         {
@@ -107,10 +118,6 @@ module.exports = function (ksc, vafb, socketServer)
 
         if (rawData['ALOLSTRG08'] && rawData['ALOTSTRG09'])
         {
-            if (!out.times.custom)
-            {
-                out.times.custom = [];
-            }
             out.times.custom.push({
                                       label: rawData['ALOLSTRG08'],
                                       time : parseDate(rawData['ALOTSTRG09'])
@@ -119,10 +126,6 @@ module.exports = function (ksc, vafb, socketServer)
 
         if (rawData['LTMLSTRG10'] && rawData['LMTTSTRG11'])
         {
-            if (!out.times.custom)
-            {
-                out.times.custom = [];
-            }
             out.times.custom.push({
                                       label: rawData['LTMLSTRG10'],
                                       time : parseDate(rawData['LTMTSTRG11'])
@@ -131,10 +134,6 @@ module.exports = function (ksc, vafb, socketServer)
 
         if (rawData['TTMLSTRG12'] && rawData['TTMTSTRG13'])
         {
-            if (!out.times.custom)
-            {
-                out.times.custom = [];
-            }
             out.times.custom.push({
                                       label: rawData['TTMLSTRG12'],
                                       time : parseDate(rawData['TTMTSTRG13'])
@@ -143,10 +142,6 @@ module.exports = function (ksc, vafb, socketServer)
 
         if (rawData['RTMLSTRG14'] && rawData['RTMTSTRG15'])
         {
-            if (!out.times.custom)
-            {
-                out.times.custom = [];
-            }
             out.times.custom.push({
                                       label: rawData['RTMLSTRG14'],
                                       time : parseDate(rawData['RTMTSTRG15'])
@@ -168,15 +163,11 @@ module.exports = function (ksc, vafb, socketServer)
             var j = ("0" + i).slice(-2);
             if (rawData['EVENTLBL' + j] && rawData['EVENTLBL' + j].length)
             {
-                events.push({
+                out.events.push({
                                 label: rawData['EVENTLBL' + j],
                                 time : rawData['EVENTTIM' + j]
                             });
             }
-        }
-        if (events.length)
-        {
-            out.events = events;
         }
 
         out.generated = Math.floor(Date.now() / 1000);
