@@ -179,8 +179,12 @@ module.exports = function (ksc, vafb, socketServer)
     {
         return function (data)
         {
-            var processed = processRawData(data.raw);
+            var newRaw = merge.recursive(true, data.raw, outputObject[key].raw);
+
+            var processed = processRawData(newRaw);
             outputObject[key] = merge(processed, data); // data already contains the generated field
+            outputObject[key].raw = newRaw; // Overwrite the raw data provided by the listener with our merged data
+
             socketServer.sendToAll(outputObject);
             writeToLegacy();
         };
