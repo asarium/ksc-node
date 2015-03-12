@@ -54,7 +54,9 @@ module.exports = function (ksc, vafb, socketServer)
                 ts = Math.floor(new Date().setUTCHours(0, 0, 0, 0) / 1000);
                 break;
             case 4:
+                // We receive a day of the year, but it's 1-indexed!
                 ts = Math.floor(Date.UTC(new Date().getUTCFullYear(), 0, 1) / 1000);
+                ts -= 86400;
                 break;
             default:
                 // Oh gods, what even is this date
