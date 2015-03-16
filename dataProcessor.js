@@ -79,7 +79,8 @@ module.exports = function (ksc, vafb, socketServer)
                 local: null,
                 windowOpens: null,
                 expected: null,
-                custom: []
+                custom: [],
+                countdowns: []
             },
             tz: null,
             hold: null,
@@ -126,19 +127,19 @@ module.exports = function (ksc, vafb, socketServer)
                                   });
         }
 
-        if (rawData['LTMLSTRG10'] && rawData['LMTTSTRG11'])
+        if (rawData['LTMLSTRG10'] && rawData['LTMTSTRG11'])
         {
-            out.times.custom.push({
+            out.times.countdowns.push({
                                       label: rawData['LTMLSTRG10'],
-                                      time : parseDate(rawData['LTMTSTRG11'])
+                                      time : rawData['LTMTSTRG11']
                                   });
         }
 
         if (rawData['TTMLSTRG12'] && rawData['TTMTSTRG13'])
         {
-            out.times.custom.push({
+            out.times.countdowns.push({
                                       label: rawData['TTMLSTRG12'],
-                                      time : parseDate(rawData['TTMTSTRG13'])
+                                      time : rawData['TTMTSTRG13']
                                   });
         }
 
@@ -181,10 +182,10 @@ module.exports = function (ksc, vafb, socketServer)
     {
         return function (data)
         {
-            var newRaw = merge.recursive(true, data.raw, outputObject[key].raw);
+            var newRaw = merge.recursive(true, outputObject[key].raw, data.raw);
 
             var processed = processRawData(newRaw);
-            outputObject[key] = merge(processed, data); // data already contains the generated field
+            outputObject[key] = merge.recursive(true, processed, data); // data already contains the generated field
             outputObject[key].raw = newRaw; // Overwrite the raw data provided by the listener with our merged data
 
             socketServer.sendToAll(outputObject);
