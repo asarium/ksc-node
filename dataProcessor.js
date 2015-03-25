@@ -12,6 +12,10 @@ module.exports = function (ksc, vafb, socketServer)
         ksc : {raw: {}},
         vafb: {raw: {}}
     };
+    var previousOutput = {
+        ksc: {},
+        vafb: {}
+    };
 
     var writingFile = false;
     var writeToLegacy = function ()
@@ -71,7 +75,7 @@ module.exports = function (ksc, vafb, socketServer)
         return ts;
     };
 
-    var processRawData = function (rawData)
+    var processRawData = function (rawData, key)
     {
         var out = {
             times: {
@@ -173,9 +177,32 @@ module.exports = function (ksc, vafb, socketServer)
             }
         }
 
-        out.generated = Math.floor(Date.now() / 1000);
+        if (config.get("Server.differentialUpdate"))
+        {
+            if (previousOutput[key] != JSON.stringify(out))
+            {
+                previousOutput[key] = JSON.stringify(out);
+                out.generated = Math.floor(Date.now() / 1000);
+                return out;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        else
+        {
+            out.generated = Math.floor(Date.now() / 1000);
+            return out;
+        }
+    };
 
-        return out;
+    var getMostRecentOutput = function()
+    {
+        return Math.max(
+            outputObject.ksc.generated || 0,
+            outputObject.vafb.generated || 0
+        );
     };
 
     var getListener = function (key)
@@ -184,12 +211,17 @@ module.exports = function (ksc, vafb, socketServer)
         {
             var newRaw = merge.recursive(true, outputObject[key].raw, data.raw);
 
-            var processed = processRawData(newRaw);
-            outputObject[key] = merge.recursive(true, processed, data); // data already contains the generated field
-            outputObject[key].raw = newRaw; // Overwrite the raw data provided by the listener with our merged data
+            var ts = getMostRecentOutput();
+            var processed = processRawData(newRaw, key);
+            if (processed) {
+                outputObject[key] = merge.recursive(true, processed, data); // data already contains the generated field
+                outputObject[key].raw = newRaw; // Overwrite the raw data provided by the listener with our merged data
 
-            socketServer.sendToAll(outputObject);
-            writeToLegacy();
+                if (processed.generated > ts) {
+                    socketServer.sendToAll(outputObject);
+                    writeToLegacy();
+                }
+            }
         };
     };
 
