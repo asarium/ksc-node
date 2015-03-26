@@ -15,3 +15,4 @@ Countdown:
 Server:
   port: 8080
   webSocketPath: /ws
+  differentialUpdate: true
